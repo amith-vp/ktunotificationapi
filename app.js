@@ -12,13 +12,6 @@ setInterval(() => {
   scrapper.fetch()
 }, 300000);
 
-var expressGoogleAnalytics = require('express-google-analytics');
- 
-// Insert your Google Analytics Id, Shoule be something like 'UA-12345678-9'
-var analytics = expressGoogleAnalytics('G-GT5SR5CWPR');
- 
-//Add to express before your routes
-app.use(analytics);
 
 
 app.get('/', (req, res) => {
