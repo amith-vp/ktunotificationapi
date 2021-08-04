@@ -1,7 +1,7 @@
 # ktunotificationapi
 Rest API of KTU ( APJ Abdul Kalam Technological University) website Notifications.
 
-# OPEN API : http://ktu.amith.ninja
+# OPEN API : https://ktu.amith.ninja
 
  API to get ktu notifications 
 
