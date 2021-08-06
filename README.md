@@ -3,13 +3,15 @@ Rest API of KTU ( APJ Abdul Kalam Technological University) website Notification
 
 # OPEN API : https://ktu.amith.ninja
 
- API to get ktu notifications 
+`GET` request to `https://ktu.amith.ninja`
+
+
+ API to get last 5 notifications from https://ktu.edu.in/eu/core/announcements.htm.
 
 
 
-## API DEMO
+## Sample Response 
 
-![api demo](https://media.discordapp.net/attachments/713261163936481343/872526255784886403/unknown.png)
 ```json
 {
     "last_updated": "2021-08-04T16:52:07.153Z",
@@ -33,3 +35,4 @@ Rest API of KTU ( APJ Abdul Kalam Technological University) website Notification
     }]
 }
 ```
+![api demo](https://media.discordapp.net/attachments/713261163936481343/872526255784886403/unknown.png)
