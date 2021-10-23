@@ -38,7 +38,7 @@ module.exports = {
     
     
             let date = getFromBetween.get(notificationTime, "<strong>", "</strong>")[0];
-            let title = getFromBetween.get(notificationData, "<b>", "</b>")[0];
+            let title = getFromBetween.get(notificationData, "<b>", "</b>")[0].replace(/&amp;/g, '&');
             let description = getFromBetween.get(notificationData, "</b>", "<!-- </a> -->")[0].replace(/<\/p>|<br>/g, ' ');
             let link = getFromBetween.get(notificationData, "<a href=\\\"", "</a>");
     
