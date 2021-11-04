@@ -6,7 +6,7 @@ Rest API of KTU ( APJ Abdul Kalam Technological University) website Notification
 `GET` request to `http://ktu.amith.ninja`
 
 
- API to get last 5 notifications from http://ktu.edu.in/eu/core/announcements.htm.
+ API to get last 10 notifications from http://ktu.edu.in/eu/core/announcements.htm.
 
 
 
