@@ -5,7 +5,7 @@ const jsonfile= require('./notifications.json');
 
 const ktu_url = "https://www.ktu.edu.in/eu/core/announcements.htm";
 let is_ktusite_online = null;
-let limit = 10  // fetch last 5 notifications announcement page 
+let limit = 10  // fetch last 10 notifications announcement page 
 module.exports = {
   fetch: function () {
 
