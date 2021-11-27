@@ -32,14 +32,15 @@ module.exports = {
           for (let k = 0; k < limit; k++) { 
     
             const links = [];
-    
+            let description;
             const notificationTime = JSON.stringify(tablesAsJson[0][k][0]).replace(/\\t|\\n|<p>|  /g, '');
             const notificationData = JSON.stringify(tablesAsJson[0][k][1]).replace(/\\t|\\n|<p>|  /g, '');
     
     
             let date = getFromBetween.get(notificationTime, "<strong>", "</strong>")[0];
             let title = getFromBetween.get(notificationData, "<b>", "</b>")[0].replace(/&amp;/g, '&');
-            let description = getFromBetween.get(notificationData, "</b>", "<!-- </a> -->")[0].replace(/<\/p>|<br>/g, ' ');
+            let desc = getFromBetween.get(notificationData, "</b>", "<!-- </a> -->")[0];
+            if (desc) description = desc.replace(/<\/p>|<br>/g, ' ')
             let link = getFromBetween.get(notificationData, "<a href=\\\"", "</a>");
     
     
