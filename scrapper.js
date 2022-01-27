@@ -48,7 +48,7 @@ module.exports = {
             link.forEach(element => {
               try {
     
-                url = "https://ktu.edu.in/eu" + getFromBetween.get(element, "/eu", "\\\"")[0].replace(/&amp;/g, '&');
+                url = "https://ktu.edu.in/eu" + getFromBetween.get(element, "/eu", "\\\"")[0].replace(/&amp;/g, '&').replace(/ /g,"%20");
                 url_title = "" + getFromBetween.get(element, "><b>", "</b>");
                 const urlData = {
                   url_title,
