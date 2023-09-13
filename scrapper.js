@@ -1,147 +1,93 @@
-const fs = require('fs');
+const fs = require('fs')
+const axios = require('axios');
+const https = require('https'); // Import the 'https' module
 
-const tabletojson = require('tabletojson').Tabletojson;
-const jsonfile= require('./notifications.json');
+const apiUrl = 'https://api.ktu.edu.in/ktu-web-portal-api/anon/announcemnts';
 
-const ktu_url = "https://www.ktu.edu.in/eu/core/announcements.htm";
-let is_ktusite_online = null;
-let limit = 10  // fetch last 10 notifications announcement page 
-module.exports = {
-  fetch: function () {
-
-    try {
-      tabletojson.convertUrl(
-        ktu_url, {
-          limitrows: limit, 
-          stripHtmlFromCells: false
-        },
-        function (tablesAsJson) {
-          if (tablesAsJson.length === 0) { //check site offline 
-            console.log("KTU Site Down");
-            jsonfile.is_ktusite_online=false;
-            fs.writeFile('notifications.json', JSON.stringify(jsonfile), function writeJSON(err) {
-              if (err) return console.log(err);
-            });
-    
-            return;
-          }
-          const notifications = [];
-    
-          is_ktusite_online = true;
-    
-          for (let k = 0; k < limit; k++) { 
-    
-            const links = [];
-            let description;
-            const notificationTime = JSON.stringify(tablesAsJson[0][k][0]).replace(/\\t|\\n|<p>|  /g, '');
-            const notificationData = JSON.stringify(tablesAsJson[0][k][1]).replace(/\\t|\\n|<p>|  /g, '');
-    
-    
-            let date = getFromBetween.get(notificationTime, "<strong>", "</strong>")[0];
-            let title = getFromBetween.get(notificationData, "<b>", "</b>")[0].replace(/&amp;/g, '&');
-            let desc = getFromBetween.get(notificationData, "</b>", "<!-- </a> -->")[0];
-            if (desc) description = desc.replace(/<\/p>|<br>/g, ' ')
-            let link = getFromBetween.get(notificationData, "<a href=\\\"", "</a>");
-    
-    
-    
-            link.forEach(element => {
-              try {
-    
-                url = "https://ktu.edu.in/eu" + getFromBetween.get(element, "/eu", "\\\"")[0].replace(/&amp;/g, '&').replace(/ /g,"%20");
-                url_title = "" + getFromBetween.get(element, "><b>", "</b>");
-                const urlData = {
-                  url_title,
-                  url,
-                };
-                links.push(urlData);
-              } catch (error) {
-                console.log(error);
-                return;
-    
-              }
-    
-    
-            });
-            const notification = {
-              date,
-              title,
-              description,
-              links
-    
-            };
-            notifications.push(notification);
-    
-          }
-          let last_updated = new Date().toISOString();
-          // var last_updated = new Date(new Date()-3600*1000*3).toISOString(); 
-             const apidata = {
-            last_updated,
-            is_ktusite_online,
-            notifications
-          };
-          const jsonContent = JSON.stringify(apidata);
-    
-    
-          fs.writeFileSync("./notifications.json", jsonContent, 'utf8', function (err) {
-            if (err) {
-              return console.log(err);
-            }
-    
-            console.log("The file was saved!");
-          });
-      
-        }
-      );
-    
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-  }
+const requestData = {
+  number: 0,
+  searchText: '',
+  size: 10,
 };
 
+const config = {
+  headers: {
+    'Accept': 'application/json, text/plain, */*',
 
-
-
-
-
-var getFromBetween = {
-  results: [],
-  string: "",
-  getFromBetween: function (sub1, sub2) {
-    if (this.string.indexOf(sub1) < 0 || this.string.indexOf(sub2) < 0) return false;
-    var SP = this.string.indexOf(sub1) + sub1.length;
-    var string1 = this.string.substr(0, SP);
-    var string2 = this.string.substr(SP);
-    var TP = string1.length + string2.indexOf(sub2);
-    return this.string.substring(SP, TP);
   },
-  removeFromBetween: function (sub1, sub2) {
-    if (this.string.indexOf(sub1) < 0 || this.string.indexOf(sub2) < 0) return false;
-    var removal = sub1 + this.getFromBetween(sub1, sub2) + sub2;
-    this.string = this.string.replace(removal, "");
-  },
-  getAllResults: function (sub1, sub2) {
-    // first check to see if we do have both substrings
-    if (this.string.indexOf(sub1) < 0 || this.string.indexOf(sub2) < 0) return;
+  referrer: 'https://www.ktu.edu.in/',
+  referrerPolicy: 'strict-origin-when-cross-origin',
+  method: 'post',
+  data: requestData,
+  url: apiUrl,
+  httpsAgent: new https.Agent({
+    rejectUnauthorized: false, // Bypass SSL certificate verification
+  }),
+};
 
-    // find one result
-    var result = this.getFromBetween(sub1, sub2);
-    // push it to the results array
-    this.results.push(result);
-    // remove the most recently found one from the string
-    this.removeFromBetween(sub1, sub2);
+async function fetchData() {
+  try {
+    const response = await axios(config);
 
-    // if there's more substrings
-    if (this.string.indexOf(sub1) > -1 && this.string.indexOf(sub2) > -1) {
-      this.getAllResults(sub1, sub2);
-    } else return;
-  },
-  get: function (string, sub1, sub2) {
-    this.results = [];
-    this.string = string;
-    this.getAllResults(sub1, sub2);
-    return this.results;
+    if (response.status !== 200) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const jsonData = response.data;
+    if (jsonData && jsonData.content) {
+      const notifications = [];
+
+      jsonData.content.slice(0, 10).forEach((item) => {
+        const date = item.announcementDate;
+        const title = item.subject;
+        const description = item.message;
+
+        // Extract attachment information
+        const attachmentList = item.attachmentList;
+        const links = [];
+
+        attachmentList.forEach((attachment) => {
+          const url_title = attachment.title;
+          const url = `https://www.ktu.edu.in/Menu/announcements`; // Modify the URL as needed
+
+          links.push({
+            url_title,
+            url,
+          });
+        });
+
+        const notification = {
+          date,
+          title,
+          description,
+          links,
+        };
+
+        notifications.push(notification);
+      });
+
+      // Create the result object
+      const result = {
+        last_updated: new Date().toISOString(),
+        is_ktusite_online: true, // You can set this value based on your logic
+        notifications,
+      };
+
+      // Save the result to notifications.json
+      fs.writeFileSync('./notifications.json', JSON.stringify(result, null, 2), 'utf8');
+    } else {
+      // Handle the case where there's no content in the JSON data
+      console.log('No content found in JSON data.');
+    }
+
+    // You can manipulate or extract information from 'data' as needed
+
+  } catch (error) {
+    console.error('Error:', error);
   }
+}
+
+// Call the function to fetch and process the data
+module.exports = {
+  fetchData,
 };

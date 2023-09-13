@@ -6,10 +6,10 @@ const fs = require('fs');
 const dataPath = 'notifications.json';
 
 
-scrapper.fetch()
+scrapper.fetchData()
 
 setInterval(() => {
-  scrapper.fetch()
+  scrapper.fetchData()
 }, 300000);
 
 app.use(function(req, res, next) {

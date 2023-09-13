@@ -1,16 +1,7 @@
 {
-  "name": "ktu-webscraper",
-  "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "date-and-time": "^1.0.1",
-    "express": "^4.17.1",
-    "tabletojson": "^2.0.7"
+    "axios": "^1.5.0",
+    "express": "^4.18.2",
+    "https": "^1.0.0"
   }
 }
